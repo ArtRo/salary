@@ -1,0 +1,2 @@
+let addEmployee = 'CREATE TABLE employee(id INTEGER PRIMARY KEY AUTOINCREMENT,name text NOT NULL,' +
+    'sex INTEGER NOT NULL,entryTime text NOT NULL,onTrial INTEGER NOT NULL,onJob INTEGER NOT NULL)';
