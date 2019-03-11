@@ -1,12 +1,49 @@
-class AttendanceRecord{
+import moment from 'moment'
+const SqlModel = require('./SqlModel');
+class AttendanceRecord extends SqlModel{
 
-
-    get employeeId() {
-        return this._employeeId;
+    constructor(){
+        super();
+        this.absenteeismDays = 0;
+        this.currentMonth = moment(new Date()).format("YYYY-MM");
+        this.leaveHours = 0;
+        this.leaveDays = 0;
+        this.lateTimes = 0;
+        this.lateMinutes = 0;
+        this.lateHours = 0;
+        this.leaveEarlyTimes = 0;
+        this.absenteeismDays = 0;
+        this.leaveEarlyHours = 0;
+        this.otherReward = 0;
+        this.bonus = 0;
+        this.fine = 0;
+        this.workingDay = 21;
+        this.empId = undefined;
     }
 
-    set employeeId(value) {
-        this._employeeId = value;
+    get auditId() {
+        return this._auditId;
+    }
+
+    set auditId(value) {
+        this._auditId = value;
+    }
+
+    get empId() {
+        return this._empId;
+    }
+
+    set empId(value) {
+        this._empId = value;
+    }
+
+
+    get currentMonth() {
+        return this._currentMonth;
+    }
+
+    set currentMonth(value) {
+        this._currentMonth = value;
     }
 
     //请假小时
@@ -88,13 +125,13 @@ class AttendanceRecord{
     }
 
     //其他
-    get other() {
-        return this._other;
+    get otherReward() {
+        return this._otherReward;
     }
 
 
-    set other(value) {
-        this._other = value;
+    set otherReward(value) {
+        this._otherReward = value;
     }
 
     //奖金
@@ -114,5 +151,6 @@ class AttendanceRecord{
     set fine(value) {
         this._fine = value;
     }
+
 }
 module.exports= AttendanceRecord;

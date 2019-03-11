@@ -5,19 +5,18 @@
                 <el-button type="success" @click="addDeduction">添加</el-button>
             </el-col>
             <el-col :span="6">
-                <el-input
-                        placeholder="请输入员工名称"
-                        prefix-icon="el-icon-search"
-                        v-model="searchName">
-                </el-input>
+                <el-input placeholder="请输入员工名称" prefix-icon="el-icon-search" v-model="searchName"/>
             </el-col>
             <el-col :span="6" style="text-align: end">
                 <el-button type="info" @click="searchDeduction">搜索</el-button>
             </el-col>
         </el-row>
         <el-table
-                :data="salaryList"
-                style="width: 100%">
+                v-loading="loading"
+                element-loading-text="拼命加载中"
+                element-loading-spinner="el-icon-loading"
+                element-loading-background="rgba(0, 0, 0, 0.8)"
+                :data="salaryList" style="width: 100%">
             <el-table-column type="expand">
                 <template slot-scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
@@ -51,70 +50,76 @@
                     </el-form>
                 </template>
             </el-table-column>
-            <el-table-column
-                    label="员工名称"
-                    prop="empName">
+            <el-table-column label="员工名称" prop="name"/>
+            <el-table-column label="专项扣除" prop="deduction"/>
+            <el-table-column label="税前工资" prop="grossPay"/>
+            <el-table-column label="package" prop="package"/>
+            <el-table-column label="是否生效">
+                <template slot-scope="scope">
+                    {{scope.row.status==1?'是':'否'}}
+                </template>
             </el-table-column>
-            <el-table-column
-                    label="专项扣除"
-                    prop="deduction">
-            </el-table-column>
-            <el-table-column
-                    label="税前工资"
-                    prop="grossPay">
-            </el-table-column>
-            <el-table-column
-                    label="package"
-                    prop="package">
-            </el-table-column>
-            <el-table-column
-                    label="是否生效"
-                    prop="status">
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+                </template>
             </el-table-column>
         </el-table>
+        <div class="block">
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                    :current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper" :total="total">
+            </el-pagination>
+        </div>
         <el-dialog title="专项扣除信息" :visible.sync="dialogFormVisible">
-            <el-form :model="deductionInfo">
+            <el-form v-if="deductionInfo" :model="deductionInfo">
                 <el-form-item label="所属员工" :label-width="'120px'">
                     <select v-model="deductionInfo.employeeId" placeholder="请选择员工">
                         <option v-for="(item,index) in empInfos" :value="item.empId">{{item.name}}</option>
                     </select>
                 </el-form-item>
                 <el-form-item label="五险(个人)" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.fiveRisksByPerson"  autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.fiveRisksByPerson"></input>
                 </el-form-item>
                 <el-form-item label="五险(公司)" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.fiveRisksByCompany"  autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.fiveRisksByCompany"></input>
                 </el-form-item>
                 <el-form-item label="公积金(个人)" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.oneGoldByperson" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.oneGoldByperson"></input>
                 </el-form-item>
                 <el-form-item label="公积金(公司)" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.oneGoldByCompany" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.oneGoldByCompany"></input>
                 </el-form-item>
                 <el-form-item label="税前工资" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.grossPay" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.grossPay"></input>
                 </el-form-item>
                 <el-form-item label="子女" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.children" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.children"></input>
                 </el-form-item>
                 <el-form-item label="教育" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.education" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.education"></input>
                 </el-form-item>
                 <el-form-item label="住房" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.housing" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.housing"></input>
                 </el-form-item>
                 <el-form-item label="大病" :label-width="'120px'">
-                    <!--<input type="number" :v-model="deductionInfo.seriousIllness" autocomplete="off"></input>-->
-                    <input type="number" :value="deductionInfo.seriousIllness" @input="setasd($event)"></input>
+                    <input type="number" v-model="deductionInfo.seriousIllness"></input>
+                    <!--<input type="number" :value="deductionInfo.seriousIllness" @input="setasd($event)"></input>-->
                 </el-form-item>
                 <el-form-item label="赡养" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.support" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.support"></input>
                 </el-form-item>
                 <el-form-item label="额外扣除" :label-width="'120px'">
-                    <input type="number" v-model="deductionInfo.addition" autocomplete="off"></input>
+                    <input type="number" v-model="deductionInfo.addition"></input>
                 </el-form-item>
                 <el-form-item label="专项扣除" :label-width="'120px'">
-                    <input type="number" :value="deductionInfo.deduction" disabled="disabled"></input>
+                    <input type="number" :value="deduction" disabled="disabled"></input>
+                </el-form-item>
+                <el-form-item label="是否可用" :label-width="'120px'">
+                    <select v-model="deductionInfo.status" placeholder="是否可用">
+                        <option label="可用" value="1"></option>
+                        <option label="不可用" value="0"></option>
+                    </select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -127,22 +132,31 @@
 
 <script>
     import comFunc from '@/assets/js/common.js'
+
     const Salary = require('../../main/sqlOperation/model/Salary');
+    const SpecialDeduction = require('../assets/Vo/SpecialDeduction');
     export default {
         name: "SpecialDeduction",
         data() {
             return {
+                currentPage: 0,
+                pageSize: 10,
+                total: 0,
+                where:{},
                 empInfos: [],
                 salaryList: [],
                 searchName: '',
                 dialogFormVisible: false,
-                deductionInfo: new Salary(),
+                deductionInfo: null,
+                deduction: 0,
+                package: 0,
                 operateType: 0, //0 添加 1 修改,
-                asdf: 0
+                loading:true
             }
         },
         mounted() {
             const _this = this;
+            this.getDeduction();
             comFunc.getempInfos(this.sqlOperate, null, null, null, null, function (res) {
                 if (res.error) {
                     console.log(res.error);
@@ -150,20 +164,58 @@
                     _this.empInfos = res;
                 }
             });
-            window.a = this;
         },
         methods: {
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.getRoleList();
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.getRoleList();
+            },
+            getDeduction: function () {
+                let _this = this;
+                this.sqlOperate.selectSql("Select * from salary inner join employee" +
+                    " on employee.empId = salary.employeeId where 1=1", this.where, null,
+                    [_this.pageSize, _this.currentPage * _this.pageSize], function (res) {
+                        if (res.error) {
+                            console.log(res.error)
+                        } else {
+                            _this.salaryList=[];
+                            res.forEach(dedution => {
+                                _this.salaryList.push(SpecialDeduction.objectFromObject(true,dedution))
+                            });
+                            _this.total = res.length;
+                        }
+                        _this.loading = false;
+                    })
+            },
             searchDeduction: function () {
-                console.log(this.searchName);
+               this.where['employee.name'] = "'"+this.searchName+"'";
+               this.getDeduction();
             },
             addDeduction: function () {
                 this.dialogFormVisible = true;
                 let _this = this;
                 this.deductionInfo = new Salary(() => {
-                    _this.asdf = _this.deductionInfo.deduction;
+                    _this.deduction = _this.deductionInfo.deduction;
+                },()=>{
+                    _this.package = _this.deductionInfo.package;
                 });
                 this.operateType = 0;
-                window.asd = this.deductionInfo;
+                window.a = this.deductionInfo;
+            },
+            handleEdit: function (data) {
+                let _this = this;
+                this.deductionInfo = new Salary(() => {
+                    _this.deduction = _this.deductionInfo.deduction;
+                }, ()=>{
+                    _this.package = _this.deductionInfo.package;
+                });
+                Salary.objectFromObject(false,data,this.deductionInfo);
+                this.dialogFormVisible = true;
+                this.operateType = 1;
             },
             sureOperate: function () {
                 const _this = this;
@@ -173,22 +225,45 @@
                         return;
                     }
                 }
-                this.sqlOperate.insertSql("salary", this.deductionInfo, function (res) {
-                    if (res.error) {
-                        console.log(res.error);
-                    } else {
-                        _this.salaryList = res;
-                    }
-                    _this.dialogFormVisible = false;
-                })
-            },
-            setasd($event) {
-                this.deductionInfo.seriousIllness = $event.target.value;
+                if(this.operateType == 0){
+                    this.sqlOperate.insertSql("salary", Salary.yuanTransToFen(this.deductionInfo), function (res) {
+                        if (res.error) {
+                            console.log(res.error);
+                        } else {
+                            _this.getDeduction();
+                        }
+                        _this.dialogFormVisible = false;
+                    })
+                }else {
+                    this.sqlOperate.updateSql('salary',Salary.yuanTransToFen(this.deductionInfo),
+                        {'salaryId':this.deductionInfo.salaryId},function (res) {
+                        if (res.error) {
+                            console.log(res.error);
+                        } else {
+                            _this.getDeduction();
+                        }
+                        _this.dialogFormVisible = false;
+                    })
+                }
+
             }
         }
     }
 </script>
 
 <style scoped>
+    .demo-table-expand {
+        font-size: 0;
+    }
 
+    .demo-table-expand label {
+        width: 90px;
+        color: #99a9bf;
+    }
+
+    .demo-table-expand .el-form-item {
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 50%;
+    }
 </style>

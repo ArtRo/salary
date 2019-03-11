@@ -1,27 +1,14 @@
-class Model {
-    static objectFromObject(object) {
-        let obj = new this();
-        let asdasd = this.asdadssada();
-        let keys = Object.keys(object);
-        keys.forEach((key) => {
-            let value = object[key];
-            if (asdasd && asdasd.includes(key)) {
-                value /= 100;
-            }
-            obj.__defineSetter__('key') && obj.__lookupSetter__('key').call(obj, value);
-        });
-        return obj;
-    }
+const SqlModel = require('./SqlModel');
+class Salary extends SqlModel {
 
-    static asdadssada() {
-        return [''];
+    constructor(setDeduction, setPackage) {
+        super();
+        this.setDeduction = setDeduction;
+        this.setPackage = setPackage;
     }
-}
-
-class Salary extends Model{
 
     get salaryId() {
-        return this._salaryId ;
+        return this._salaryId;
     }
 
     set salaryId(value) {
@@ -29,7 +16,7 @@ class Salary extends Model{
     }
 
     get employeeId() {
-        return this._employeeId ;
+        return this._employeeId;
     }
 
     set employeeId(value) {
@@ -37,7 +24,7 @@ class Salary extends Model{
     }
 
     get fiveRisksByPerson() {  //五险
-        return this._fiveRisksByPerson ;
+        return this._fiveRisksByPerson;
     }
 
     set fiveRisksByPerson(value) {
@@ -45,16 +32,17 @@ class Salary extends Model{
     }
 
     get fiveRisksByCompany() {
-        return this._fiveRisksByCompany ;
+        return this._fiveRisksByCompany;
     }
 
     set fiveRisksByCompany(value) {
         this._fiveRisksByCompany = value;
+        this.syncPackage();
     }
 
     //一金
     get oneGoldByperson() {
-        return this._oneGoldByperson ;
+        return this._oneGoldByperson;
     }
 
     set oneGoldByperson(value) {
@@ -62,34 +50,37 @@ class Salary extends Model{
     }
 
     get oneGoldByCompany() {
-        return this._oneGoldByCompany ;
+        return this._oneGoldByCompany;
     }
 
     set oneGoldByCompany(value) {
         this._oneGoldByCompany = value;
+        this.syncPackage();
     }
 
     //税前工资
     get grossPay() {
-        return this._grossPay ;
+        return this._grossPay;
     }
 
     set grossPay(value) {
         this._grossPay = value;
+        this.syncPackage();
     }
 
     //子女
     get children() {
-        return this._children ;
+        return this._children;
     }
 
     set children(value) {
         this._children = value;
+        this.syncDeduction();
     }
 
     //教育
     get education() {
-        return this._education ;
+        return this._education;
     }
 
     set education(value) {
@@ -99,46 +90,34 @@ class Salary extends Model{
 
     //住房
     get housing() {
-        return this._housing ;
+        return this._housing;
     }
 
     set housing(value) {
-        this._housing = value ;
+        this._housing = value;
         this.syncDeduction();
     }
 
     //大病
     get seriousIllness() {
-        return this._seriousIllness ;
+        return this._seriousIllness;
     }
 
     set seriousIllness(value) {
-        this._seriousIllness = value ;
+        this._seriousIllness = value;
         this.syncDeduction();
     }
 
     //赡养
     get support() {
-        return this._support ;
+        return this._support;
     }
 
     set support(value) {
-        this._support = value ;
+        this._support = value;
         this.syncDeduction();
     }
 
-    //专项扣除  = 住房+子女+教育+大病+赡养
-    get deduction() {
-        return this._deduction;
-    }
-
-    set deduction(value) {
-        this._deduction = value;
-    }
-
-    syncDeduction() {
-        this.deduction = ~~this.support + ~~this._seriousIllness + ~~this.housing + ~~this.education + ~~this.children;
-    }
 
     //状态 1 在使用 0 未使用
     get status() {
@@ -149,23 +128,38 @@ class Salary extends Model{
         this._status = value;
     }
 
-    //企业五险一金+税前工资
-    get package() {
-        return this.grossPay() + this.fiveRisksByCompany() + this.oneGoldByCompany();
-    }
-
-    set package(value) {
-        this._package = value;
-    }
-
     //额外扣除项
     get addition() {
-        return this._addition ;
+        return this._addition;
     }
 
     set addition(value) {
         this._addition = value;
     }
+
+    //专项扣除  = 住房+子女+教育+大病+赡养
+    syncDeduction() {
+        this.deduction = ~~this.support + ~~this.seriousIllness + ~~this.housing + ~~this.education + ~~this.children;
+        this.setDeduction && this.setDeduction();
+    }
+
+    //企业五险一金+税前工资
+    syncPackage() {
+        this.package = ~~this.grossPay + ~~this.fiveRisksByCompany + ~~this.oneGoldByCompany;
+        this.setPackage && this.setPackage();
+    }
+
+    static notNeedTrans() {
+        return ['package', 'deduction', '_package', '_deduction'];
+    }
+
+    static needTranslateDatas() {
+        return ['fiveRisksByPerson', 'fiveRisksByCompany', 'oneGoldByperson', 'oneGoldByCompany',
+            'grossPay', 'children', 'education', 'housing', 'seriousIllness', 'support', 'addition',
+            '_fiveRisksByPerson', '_fiveRisksByCompany', '_oneGoldByperson', '_oneGoldByCompany',
+            '_grossPay', '_children', '_education', '_housing', '_seriousIllness', '_support', '_addition'];
+    }
+
 }
 
 module.exports = Salary;
