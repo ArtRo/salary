@@ -1,5 +1,6 @@
 class SqlModel {
 
+    //两个model 相互转化
     static objectFromObject(isConversion, object, toObject) {
         let obj = toObject || new this();
         let neendTransDatas = this.needTranslateDatas();
@@ -15,6 +16,17 @@ class SqlModel {
         console.log(obj);
         return obj;
     }
+
+    static delDownslide(object){
+        let obj = {};
+        let keys = Object.keys(object);
+        keys.forEach(key =>{
+            obj[this.addOrDelDownslide(false,key)] = object[key];
+        });
+        console.log(obj);
+        return obj;
+    }
+    //去掉object 变量的下划线
 
     //将元转化成分 *100
     static yuanTransToFen(object) {

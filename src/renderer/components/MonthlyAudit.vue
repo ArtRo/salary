@@ -7,6 +7,16 @@
             <el-col :span="6">
                 <el-input placeholder="请输入员工名称" prefix-icon="el-icon-search" v-model="searchName"/>
             </el-col>
+            <el-col :span="8">
+                <el-date-picker
+                        style="margin-left: 20px"
+                        v-model="value7"
+                        type="month"
+                        value-format="yyyy-MM"
+                        format="yyyy-MM"
+                        placeholder="选择月">
+                </el-date-picker>
+            </el-col>
             <el-col :span="6" style="text-align: end">
                 <el-button type="info" @click="searchDeduction">搜索</el-button>
             </el-col>
@@ -52,7 +62,7 @@
             <el-table-column label="奖金" prop="bonus"/>
             <el-table-column label="其他奖励" prop="otherReward"/>
             <el-table-column label="罚款" prop="fine"/>
-            <el-table-column label="所处月份" prop="currentMonth"/>
+            <el-table-column label="所处月份" prop="currentMonth" sortable/>
             <el-table-column label="操作">
                 <template slot-scope="scope">
                     <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
@@ -142,12 +152,13 @@
                 value7: '',
                 currentMonth: '',
                 currentPage: 0,
-                pageSize: 0,
+                pageSize: 10,
                 total: 0,
                 dialogFormVisible: false,
                 auditInfo: null,
                 empInfos: [],
-                operateType: 0 // 0 添加 1 修改
+                operateType: 0, // 0 添加 1 修改
+                where:{}
             }
         },
         mounted() {
@@ -164,14 +175,17 @@
         methods: {
             getMonthlyAudits: function () {
                 const _this = this;
-                this.sqlOperate.selectSql("select * from monthly_audit where 1=1", null, null, null, function (res) {
-                    if (res.error) {
-                        console.log(res.error);
-                    } else {
-                        _this.monthlyAudits = res;
-                    }
-                    _this.loading = false;
-                })
+                this.sqlOperate.selectSql("select monthly_audit.*,employee.name,employee.tel " +
+                    "from monthly_audit inner join employee on monthly_audit.empId = employee.empId where 1=1",
+                    this.where, null, [this.pageSize, this.currentPage * this.pageSize], function (res) {
+                        if (res.error) {
+                            console.log(res.error);
+                        } else {
+                            _this.monthlyAudits = res;
+                            _this.total = res.length;
+                        }
+                        _this.loading = false;
+                    })
             },
             handleSizeChange(val) {
                 this.pageSize = val;
@@ -186,24 +200,32 @@
                 this.auditInfo = new AttendanceRecord();
                 this.currentMonth = this.auditInfo.currentMonth;
                 this.operateType = 0;
-                window.a = this.auditInfo;
             },
             handleEdit: function (data) {
                 this.operateType = 1;
+                this.auditInfo = AttendanceRecord.objectFromObject(false,data,null);
+                this.dialogFormVisible = true;
+                this.currentMonth = this.auditInfo.currentMonth;
             },
             searchDeduction: function () {
+                if(this.value7){
+                    this.where['monthly_audit.currentMonth'] = "'"+this.value7+"'";
+                }
+                if(this.searchName){
+                    this.where['employee.name'] = "'"+this.searchName+"'";
+                }
+                this.getMonthlyAudits();
             },
             sureOperate: function () {
-
                 for (let key in this.auditInfo) {
-                    if (undefined== this.auditInfo[key]) {
+                    if (undefined == this.auditInfo[key]) {
                         alert(key + "不能为空");
                         return;
                     }
                 }
                 const _this = this;
                 if (this.operateType == 0) {
-                    this.sqlOperate.insertSql("monthly_audit", AttendanceRecord.objectFromObject(false,this.auditInfo,{}), function (res) {
+                    this.sqlOperate.insertSql("monthly_audit", AttendanceRecord.delDownslide(this.auditInfo), function (res) {
                         if (res.error) {
                             console.log(res.error)
                         } else {
@@ -211,8 +233,16 @@
                         }
                         _this.dialogFormVisible = false;
                     })
-                }else {
-
+                } else {
+                    this.sqlOperate.updateSql("monthly_audit",AttendanceRecord.delDownslide(this.auditInfo),
+                        {'auditId':this.auditInfo.auditId},function (res) {
+                            if(res.error){
+                                console.log(res.error);
+                            }else {
+                                _this.getMonthlyAudits();
+                            }
+                            _this.dialogFormVisible = false;
+                        })
                 }
             },
             changeTime: function () {
