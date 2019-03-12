@@ -1,4 +1,5 @@
-class EmployeeInfo {
+const SqlModel = require('./SqlModel')
+class EmployeeInfo extends SqlModel{
 
     //是否试用 1 使用 0 正式
     get onTrial() {

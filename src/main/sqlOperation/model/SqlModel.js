@@ -13,34 +13,50 @@ class SqlModel {
             }
             obj.__lookupSetter__(this.addOrDelDownslide(false, key)) && obj.__lookupSetter__(this.addOrDelDownslide(false, key)).call(obj, value);
         });
-        console.log(obj);
         return obj;
     }
 
-    static delDownslide(object){
-        let obj = {};
+    //去掉object 变量的下划线
+    static delDownslide(object,toObject){
+        let obj = toObject || {};
         let keys = Object.keys(object);
         keys.forEach(key =>{
-            obj[this.addOrDelDownslide(false,key)] = object[key];
+            if(toObject){
+                obj.__lookupSetter__(this.addOrDelDownslide(false, key)) && obj.__lookupSetter__(this.addOrDelDownslide(false, key)).call(obj, object[key]);
+            }else {
+                obj[this.addOrDelDownslide(false,key)] = object[key];
+            }
         });
-        console.log(obj);
+        if(toObject){
+            return this.delDownslide(obj);
+        }
         return obj;
     }
-    //去掉object 变量的下划线
+
 
     //将元转化成分 *100
-    static yuanTransToFen(object) {
-        let finishedData = {};
+    static yuanTransToFen(object,toObject) {
+        let finishedData = toObject || {};
         let needTrans = this.needTranslateDatas();
         let keys = Object.keys(object);
         keys.forEach(key => {
             if (key && needTrans && needTrans.includes(key)) {
-                finishedData[this.addOrDelDownslide(false, key)] = object[key] * 100;
+                if(toObject){
+                    finishedData.__lookupSetter__(this.addOrDelDownslide(false, key)) &&
+                    finishedData.__lookupSetter__(this.addOrDelDownslide(false, key)).call(finishedData, object[key]*100);
+                }else {
+                    finishedData[this.addOrDelDownslide(false, key)] = object[key] * 100;
+                }
             } else if (key && this.notNeedTrans() && !this.notNeedTrans().includes(key) && !(object[key] instanceof Function)) {
-                finishedData[this.addOrDelDownslide(false, key)] = object[key];
+                if(toObject){
+                    finishedData.__lookupSetter__(this.addOrDelDownslide(false, key)) &&
+                    finishedData.__lookupSetter__(this.addOrDelDownslide(false, key)).call(finishedData, object[key]);
+                }else {
+                    finishedData[this.addOrDelDownslide(false, key)] = object[key];
+                }
+
             }
         });
-        console.log(finishedData);
         return finishedData;
     }
 

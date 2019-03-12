@@ -1,5 +1,6 @@
 import moment from 'moment'
 const SqlModel = require('./SqlModel');
+const sqlOper = require('../SqlOperate');
 class AttendanceRecord extends SqlModel{
 
     constructor(){
@@ -151,6 +152,62 @@ class AttendanceRecord extends SqlModel{
     set fine(value) {
         this._fine = value;
     }
+
+
+    //对外应税工资 默认等于TaxableSalary
+    get outTaxableSalary() {
+        return this._outTaxableSalary;
+    }
+
+    set outTaxableSalary(value) {
+        this._outTaxableSalary = value;
+    }
+
+    //累积五险一金
+    get staRisksAndFund() {
+        return this._staRisksAndFund;
+    }
+
+    set staRisksAndFund(value) {
+        this._staRisksAndFund = value;
+    }
+
+    //累积专项扣除(累积到上月)
+    get staAccuDeduction() {
+        return this._staAccuDeduction;
+    }
+
+    set staAccuDeduction(value) {
+        this._staAccuDeduction = value;
+    }
+
+    //累积已扣除税(累积到上个月)
+    get staTaxed() {
+        return this._staTaxed;
+    }
+
+    set staTaxed(value) {
+        this._staTaxed = value;
+    }
+
+    //累积应税工资 带sta的均累积到上一个月份
+    get staTaxableSalary() {
+        return this._staTaxableSalary;
+    }
+
+    set staTaxableSalary(value) {
+        this._staTaxableSalary = value;
+    }
+
+    static needTranslateDatas() {
+        return ['fine','_fine','bonus','_bonus','otherReward','otherReward','staTaxableSalary','_staTaxableSalary',
+        'staTaxed','_staTaxed','staAccuDeduction','_staAccuDeduction','staRisksAndFund','_staRisksAndFund','outTaxableSalary',
+        '_outTaxableSalary'];
+    };
+
+    static notNeedTrans() {
+        return [''];
+    };
 
 }
 module.exports= AttendanceRecord;

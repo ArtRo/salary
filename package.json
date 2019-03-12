@@ -53,13 +53,15 @@
   "dependencies": {
     "axios": "^0.18.0",
     "element-ui": "^2.6.1",
+    "file-saver": "^2.0.1",
     "moment": "^2.24.0",
     "sqlite-sync": "^0.3.8",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
-    "vuex-electron": "^1.0.0"
+    "vuex-electron": "^1.0.0",
+    "xlsx": "^0.14.1"
   },
   "devDependencies": {
     "ajv": "^6.5.0",

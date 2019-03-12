@@ -67,8 +67,8 @@
         </el-table>
         <div class="block">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                    :current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
-                    layout="total, sizes, prev, pager, next, jumper" :total="total">
+                           :current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+                           layout="total, sizes, prev, pager, next, jumper" :total="total">
             </el-pagination>
         </div>
         <el-dialog title="专项扣除信息" :visible.sync="dialogFormVisible">
@@ -142,7 +142,7 @@
                 currentPage: 0,
                 pageSize: 10,
                 total: 0,
-                where:{},
+                where: {},
                 empInfos: [],
                 salaryList: [],
                 searchName: '',
@@ -151,7 +151,7 @@
                 deduction: 0,
                 package: 0,
                 operateType: 0, //0 添加 1 修改,
-                loading:true
+                loading: true
             }
         },
         mounted() {
@@ -182,9 +182,9 @@
                         if (res.error) {
                             console.log(res.error)
                         } else {
-                            _this.salaryList=[];
+                            _this.salaryList = [];
                             res.forEach(dedution => {
-                                _this.salaryList.push(SpecialDeduction.objectFromObject(true,dedution))
+                                _this.salaryList.push(SpecialDeduction.objectFromObject(true, dedution))
                             });
                             _this.total = res.length;
                         }
@@ -192,15 +192,15 @@
                     })
             },
             searchDeduction: function () {
-               this.where['employee.name'] = "'"+this.searchName+"'";
-               this.getDeduction();
+                this.where['employee.name'] = "'" + this.searchName + "'";
+                this.getDeduction();
             },
             addDeduction: function () {
                 this.dialogFormVisible = true;
                 let _this = this;
                 this.deductionInfo = new Salary(() => {
                     _this.deduction = _this.deductionInfo.deduction;
-                },()=>{
+                }, () => {
                     _this.package = _this.deductionInfo.package;
                 });
                 this.operateType = 0;
@@ -210,22 +210,22 @@
                 let _this = this;
                 this.deductionInfo = new Salary(() => {
                     _this.deduction = _this.deductionInfo.deduction;
-                }, ()=>{
+                }, () => {
                     _this.package = _this.deductionInfo.package;
                 });
-                Salary.objectFromObject(false,data,this.deductionInfo);
+                Salary.objectFromObject(false, data, this.deductionInfo);
                 this.dialogFormVisible = true;
                 this.operateType = 1;
             },
             sureOperate: function () {
                 const _this = this;
                 for (let key in this.deductionInfo) {
-                    if (!this.deductionInfo[key]) {
+                    if (undefined == this.deductionInfo[key]) {
                         alert(key + "不能为空");
                         return;
                     }
                 }
-                if(this.operateType == 0){
+                if (this.operateType == 0) {
                     this.sqlOperate.insertSql("salary", Salary.yuanTransToFen(this.deductionInfo), function (res) {
                         if (res.error) {
                             console.log(res.error);
@@ -234,16 +234,16 @@
                         }
                         _this.dialogFormVisible = false;
                     })
-                }else {
-                    this.sqlOperate.updateSql('salary',Salary.yuanTransToFen(this.deductionInfo),
-                        {'salaryId':this.deductionInfo.salaryId},function (res) {
-                        if (res.error) {
-                            console.log(res.error);
-                        } else {
-                            _this.getDeduction();
-                        }
-                        _this.dialogFormVisible = false;
-                    })
+                } else {
+                    this.sqlOperate.updateSql('salary', Salary.yuanTransToFen(this.deductionInfo),
+                        {'salaryId': this.deductionInfo.salaryId}, function (res) {
+                            if (res.error) {
+                                console.log(res.error);
+                            } else {
+                                _this.getDeduction();
+                            }
+                            _this.dialogFormVisible = false;
+                        })
                 }
 
             }
