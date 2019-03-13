@@ -19,6 +19,7 @@
   "build": {
     "productName": "oa-salary",
     "appId": "com.example.yourapp",
+    "asar":false,
     "directories": {
       "output": "build"
     },
