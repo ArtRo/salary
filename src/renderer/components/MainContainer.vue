@@ -2,26 +2,26 @@
     <div>
         <el-container style="height: 960px; border: 1px solid #eee">
             <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-                <el-menu :default-openeds="['1']">
+                <el-menu :default-openeds="openedMenu" unique-opened>
                     <el-submenu index="1">
                         <template slot="title"><i class="el-icon-setting"></i>员工管理</template>
                         <router-link to="/employee">
-                            <el-menu-item index="1-1">员工列表</el-menu-item>
+                            <el-menu-item index="1">员工列表</el-menu-item>
                         </router-link>
                     </el-submenu>
                     <el-submenu index="2">
                         <template slot="title"><i class="el-icon-menu"></i>薪资管理</template>
                         <router-link to="/specialDeduction">
-                            <el-menu-item index="2-1">专项扣除</el-menu-item>
+                            <el-menu-item index="2">专项扣除</el-menu-item>
                         </router-link>
                         <router-link to="/monthlyAudit">
-                            <el-menu-item index="2-2">月度审核</el-menu-item>
+                            <el-menu-item index="2">月度审核</el-menu-item>
                         </router-link>
                     </el-submenu>
                     <el-submenu index="3">
                         <template slot="title"><i class="el-icon-message"></i>工资管理</template>
                         <router-link to="/salary">
-                            <el-menu-item index="3-1">薪资查看</el-menu-item>
+                            <el-menu-item index="3">薪资查看</el-menu-item>
                         </router-link>
                     </el-submenu>
                 </el-menu>
@@ -45,6 +45,7 @@
         name: "SiderContainer",
         data() {
             return {
+                openedMenu:['1']
             }
         }
     }

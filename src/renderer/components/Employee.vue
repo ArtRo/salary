@@ -183,17 +183,17 @@
             }
         },
         mounted() {
-            this.getRoleList()
+            this.getEmployees();
         },
         methods: {
             searchEmployee:function(){
+                this.where = {};
                 if(this.onTrial){
                     this.where['onTrial']=this.onTrial;
                 }
-                console.log(this.where);
-                this.getRoleList();
+                this.getEmployees();
             },
-            getRoleList: function () {
+            getEmployees: function () {
                 const _this = this;
                 let timeGap = '';
                 if(_this.value7 && _this.value7.length == 2){
@@ -225,11 +225,11 @@
             },
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.getRoleList();
+                this.getEmployees();
             },
             handleCurrentChange(val) {
                 this.currentPage = val;
-                this.getRoleList();
+                this.getEmployees();
             },
             sureOperate() {
                 let _this = this;
@@ -238,7 +238,7 @@
                         if (res.error) {
                             console.log(res.error);
                         } else {
-                            _this.getRoleList();
+                            _this.getEmployees();
                         }
                         _this.dialogFormVisible = false;
                     })
@@ -247,7 +247,7 @@
                         if (res.error) {
                             console.log(res.error);
                         } else {
-                            _this.getRoleList();
+                            _this.getEmployees();
                         }
                         _this.dialogFormVisible = false;
                     })

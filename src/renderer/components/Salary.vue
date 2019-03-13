@@ -125,14 +125,61 @@
                     {{scope.row.monthlyAudit.additionDudection/100}}
                 </template>
             </el-table-column>
-            <el-table-column label="累积附加合计" prop="currentMonth"/>
-            <el-table-column label="应税工资" prop="monthlyAudit.taxableSalary"/>
-            <el-table-column label="累计应发数" prop="currentMonth"/>
-            <el-table-column label="应纳税额" prop="currentMonth"/>
-            <el-table-column label="累计扣税" prop="currentMonth"/>
-            <el-table-column label="扣税" prop="currentMonth"/>
-            <el-table-column label="实发工资" prop="currentMonth"/>
-            <el-table-column label="税后(核算用)" prop="currentMonth"/>
+            <el-table-column label="累积附加合计">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.accuAdditionDeduction/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="社保累积">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.accuFiveRiskeAndFund/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="应税工资">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.taxableSalary/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="应税工资(外)" prop="currentMonth">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.outTaxableSalary/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="累计应发数">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.accuTaxableSalary/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="应纳税额">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.taxableSalaryOnMonth/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="累计扣税">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.accuTaxed/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="扣税">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.taxedOnMonth/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="实发工资">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.actualSalaryOnMonth/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="现金">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.cash/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="package(外)">
+                <template slot-scope="scope">
+                    {{scope.row.monthlyAudit.outPackage/100}}
+                </template>
+            </el-table-column>
         </el-table>
         <div class="block">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -144,6 +191,8 @@
 </template>
 
 <script>
+    import FileSaver from 'file-saver'
+    import XLSX from 'xlsx'
     const MonthlyAudit = require('../assets/Vo/MonthlyAudit');
     const Employee = require('../../main/sqlOperation/model/Employee');
     const Salary = require('../../main/sqlOperation/model/Salary');
@@ -172,7 +221,7 @@
                 /* get binary string as output */
                 let wbout = XLSX.write(wb, {bookType: 'xlsx', bookSST: true, type: 'array'});
                 try {
-                    FileSaver.saveAs(new Blob([wbout], {type: 'application/octet-stream'}), '员工工资表.xlsx')
+                    FileSaver.saveAs(new Blob([wbout], {type: 'application/octet-stream'}), '员工工资详情.xlsx')
                 } catch (e) {
                     if (typeof console !== 'undefined') console.log(e, wbout)
                 }
@@ -187,6 +236,7 @@
                 this.getRoleList();
             },
             searchSalary: function () {
+                this.where = {};
                 if (this.value7) {
                     this.where['monthly_audit.currentMonth'] = "'" + this.value7 + "'";
                 }
@@ -209,8 +259,9 @@
                                 let salaryOper = new SalaryOper();
                                 salaryOper['monthlyAudit'] = MonthlyAudit.objectFromObject(false, data, null);
                                 salaryOper['monthlyAudit'].salaryInfo = Salary.objectFromObject(false, data, null);
+                                salaryOper['monthlyAudit'].getPrevious();
                                 salaryOper['employee'] = Employee.objectFromObject(false, data, null);
-                                console.log(salaryOper);
+                                salaryOper.getAccumulateInfo();
                                 _this.salaries.push(salaryOper);
                             });
                             _this.total = res.length;

@@ -13,6 +13,7 @@ export default new Router({
         {
             path: '/',
             component: MainContainer,
+            redirect:'/employee',
             children: [
                 {
                     path: '/employee', component: Employee

@@ -62,12 +62,32 @@
             </el-table-column>
             <el-table-column label="员工名称" prop="name"/>
             <el-table-column label="月法定工作日" prop="workingDay"/>
-            <el-table-column label="奖金" prop="bonus"/>
-            <el-table-column label="其他奖励" prop="otherReward"/>
-            <el-table-column label="罚款" prop="fine"/>
+            <el-table-column label="奖金">
+                <template slot-scope="scope">
+                    {{scope.row.bonus/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="其他奖励">
+                <template slot-scope="scope">
+                    {{scope.row.otherReward/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="罚款">
+                <template slot-scope="scope">
+                    {{scope.row.fine/100}}
+                </template>
+            </el-table-column>
             <el-table-column label="所处月份" prop="currentMonth" sortable/>
-            <el-table-column label="应税工资" prop="taxableSalary" sortable/>
-            <el-table-column label="应税工资(对外)" prop="outTaxableSalary" sortable/>
+            <el-table-column label="应税工资" sortable>
+                <template slot-scope="scope">
+                    {{scope.row.taxableSalary/100}}
+                </template>
+            </el-table-column>
+            <el-table-column label="应税工资(对外)" sortable>
+                <template slot-scope="scope">
+                    {{scope.row.outTaxableSalary/100}}
+                </template>
+            </el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
                     <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
@@ -99,43 +119,43 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="工作天数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.workingDay"></input>
+                    <input type="number" v-model="auditInfo.workingDay" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="早退小时数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.leaveEarlyHours"></input>
+                    <input type="number" v-model="auditInfo.leaveEarlyHours" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="早退次数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.leaveEarlyTimes"></input>
+                    <input type="number" v-model="auditInfo.leaveEarlyTimes" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="迟到分钟数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.lateMinutes"></input>
+                    <input type="number" v-model="auditInfo.lateMinutes" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="迟到小时数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.lateHours"></input>
+                    <input type="number" v-model="auditInfo.lateHours" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="迟到次数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.lateTimes"></input>
+                    <input type="number" v-model="auditInfo.lateTimes" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="旷工天数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.absenteeismDays"></input>
+                    <input type="number" v-model="auditInfo.absenteeismDays" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="请假天数" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.leaveDays"></input>
+                    <input type="number" v-model="auditInfo.leaveDays" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="请假小时" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.leaveHours"></input>
+                    <input type="number" v-model="auditInfo.leaveHours" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="奖金" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.bonus"></input>
+                    <input type="number" v-model="auditInfo.bonus" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="其他奖励" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.otherReward"></input>
+                    <input type="number" v-model="auditInfo.otherReward" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="罚款" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.fine"></input>
+                    <input type="number" v-model="auditInfo.fine" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="应税工资" :label-width="'120px'">
-                    <input type="number" v-model="auditInfo.outTaxableSalary"></input>
+                    <input type="number" v-model="outTaxableSalary"></input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -171,7 +191,8 @@
                 auditInfo: null,
                 empInfos: [],
                 operateType: 0, // 0 添加 1 修改
-                where: {}
+                where: {},
+                outTaxableSalary: 0
             }
         },
         mounted() {
@@ -209,11 +230,10 @@
                         } else {
                             _this.monthlyAudits = [];
                             res.forEach(data => {
-                                let ma = MonthlyAudit.objectFromObject(true, data, null);
+                                let ma = MonthlyAudit.objectFromObject(false, data, null);
                                 ma.salaryInfo = Salary.objectFromObject(false, data, null);
                                 _this.monthlyAudits.push(ma);
                             });
-                            console.log(_this.monthlyAudits);
                             _this.total = res.length;
                         }
                         _this.loading = false;
@@ -226,10 +246,19 @@
                         if (res.error) {
                             console.log(res.error)
                         } else {
-                            if (res.length > 0)
-                                _this.auditInfo.salaryInfo = Salary.objectFromObject(false, res, null);
+                            _this.auditInfo.salaryInfo = {};
+                            if (res.length > 0) {
+                                _this.auditInfo.salaryInfo = Salary.objectFromObject(false, res[0], null);
+                                _this.outTaxableSalary = _this.auditInfo.outTaxableSalary / 100;
+                            } else {
+                                _this.outTaxableSalary = 0;
+                                _this.auditInfo.outTaxableSalary = 0;
+                            }
                         }
                     })
+            },
+            syncOutTaxableSalary: function () {
+                this.outTaxableSalary = this.auditInfo.getTaxableSalary() / 100;
             },
             handleSizeChange(val) {
                 this.pageSize = val;
@@ -247,11 +276,14 @@
             },
             handleEdit: function (data) {
                 this.operateType = 1;
-                this.auditInfo = MonthlyAudit.objectFromObject(false, data, null);
+                this.auditInfo = MonthlyAudit.objectFromObject(false, data, new MonthlyAudit());
+                this.auditInfo.salaryInfo = Salary.objectFromObject(false, data);
+                this.outTaxableSalary = this.auditInfo.outTaxableSalary / 100;
                 this.dialogFormVisible = true;
                 this.currentMonth = this.auditInfo.currentMonth;
             },
             searchAudit: function () {
+                this.where = {};
                 if (this.value7) {
                     this.where['monthly_audit.currentMonth'] = "'" + this.value7 + "'";
                 }
@@ -268,10 +300,12 @@
                         return;
                     }
                 }
+                this.auditInfo.outTaxableSalary = this.outTaxableSalary;
+                this.auditInfo.getPrevious();
                 const _this = this;
                 if (this.operateType == 0) {
                     this.sqlOperate.insertSql("monthly_audit",
-                        AttendanceRecord.delDownslide(AttendanceRecord.yuanTransToFen(this.auditInfo)), function (res) {
+                        AttendanceRecord.delDownslide(AttendanceRecord.yuanTransToFen(this.auditInfo, new AttendanceRecord())), function (res) {
                             if (res.error) {
                                 console.log(res.error)
                             } else {
@@ -281,7 +315,7 @@
                         })
                 } else {
                     this.sqlOperate.updateSql("monthly_audit",
-                        AttendanceRecord.delDownslide(AttendanceRecord.yuanTransToFen(this.auditInfo,new AttendanceRecord())),
+                        AttendanceRecord.delDownslide(AttendanceRecord.yuanTransToFen(this.auditInfo, new AttendanceRecord())),
                         {'auditId': this.auditInfo.auditId}, function (res) {
                             if (res.error) {
                                 console.log(res.error);

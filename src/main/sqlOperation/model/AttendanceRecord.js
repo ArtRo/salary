@@ -200,9 +200,7 @@ class AttendanceRecord extends SqlModel{
     }
 
     static needTranslateDatas() {
-        return ['fine','_fine','bonus','_bonus','otherReward','otherReward','staTaxableSalary','_staTaxableSalary',
-        'staTaxed','_staTaxed','staAccuDeduction','_staAccuDeduction','staRisksAndFund','_staRisksAndFund','outTaxableSalary',
-        '_outTaxableSalary'];
+        return ['fine','_fine','bonus','_bonus','otherReward','otherReward','outTaxableSalary', '_outTaxableSalary'];
     };
 
     static notNeedTrans() {

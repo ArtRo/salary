@@ -192,6 +192,7 @@
                     })
             },
             searchDeduction: function () {
+                this.where = {};
                 this.where['employee.name'] = "'" + this.searchName + "'";
                 this.getDeduction();
             },
