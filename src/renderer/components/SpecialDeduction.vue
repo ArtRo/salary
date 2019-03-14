@@ -109,7 +109,7 @@
                 <el-form-item label="赡养" :label-width="'120px'">
                     <input type="number" v-model="deductionInfo.support"></input>
                 </el-form-item>
-                <el-form-item label="额外扣除" :label-width="'120px'">
+                <el-form-item label="起征点" :label-width="'120px'">
                     <input type="number" v-model="deductionInfo.addition"></input>
                 </el-form-item>
                 <el-form-item label="专项扣除" :label-width="'120px'">

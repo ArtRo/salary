@@ -155,6 +155,9 @@
                     <input type="number" v-model="auditInfo.fine" @change="syncOutTaxableSalary"></input>
                 </el-form-item>
                 <el-form-item label="应税工资" :label-width="'120px'">
+                    <input type="number" v-model="taxableSalary" disabled="disabled"></input>
+                </el-form-item>
+                <el-form-item label="应税工资(对外)" :label-width="'120px'">
                     <input type="number" v-model="outTaxableSalary"></input>
                 </el-form-item>
             </el-form>
@@ -192,7 +195,8 @@
                 empInfos: [],
                 operateType: 0, // 0 添加 1 修改
                 where: {},
-                outTaxableSalary: 0
+                outTaxableSalary: 0,
+                taxableSalary: 0
             }
         },
         mounted() {
@@ -259,6 +263,7 @@
             },
             syncOutTaxableSalary: function () {
                 this.outTaxableSalary = this.auditInfo.getTaxableSalary() / 100;
+                this.taxableSalary = this.outTaxableSalary;
             },
             handleSizeChange(val) {
                 this.pageSize = val;
@@ -277,8 +282,8 @@
             handleEdit: function (data) {
                 this.operateType = 1;
                 this.auditInfo = MonthlyAudit.objectFromObject(false, data, new MonthlyAudit());
-                this.auditInfo.salaryInfo = Salary.objectFromObject(false, data);
                 this.outTaxableSalary = this.auditInfo.outTaxableSalary / 100;
+                this.taxableSalary = this.auditInfo.taxableSalary / 100;
                 this.dialogFormVisible = true;
                 this.currentMonth = this.auditInfo.currentMonth;
             },
