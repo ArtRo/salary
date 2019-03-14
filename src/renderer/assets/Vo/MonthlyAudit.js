@@ -1,6 +1,5 @@
 const AttendanceRecord = require('../../../main/sqlOperation/model/AttendanceRecord');
 const Salary = require('../../../main/sqlOperation/model/Salary');
-const sqlOper = require('../../../main/sqlOperation/SqlOperate');
 import Moment from 'moment'
 
 class MonthlyAudit extends AttendanceRecord {
@@ -61,7 +60,7 @@ class MonthlyAudit extends AttendanceRecord {
             let month = this.currentMonth;
             let empId = this.empId;
             let previousMonth = Moment(month, 'YYYY-MM').month(Moment(month, 'YYYY-MM').month() - 1).format('YYYY-MM');
-            sqlOper.selectSql("select * from monthly_audit inner join salary on monthly_audit.empId = salary.employeeId where 1=1", {
+            sqlOperation().selectSql("select * from monthly_audit inner join salary on monthly_audit.empId = salary.employeeId where 1=1", {
                 'currentMonth': "'" + previousMonth + "'",
                 'empId': empId
             }, null, null, function (res) {
@@ -241,7 +240,9 @@ class MonthlyAudit extends AttendanceRecord {
 
     //获取外package
     getOutPackage() {
-        this.outPackage = ~~this.cash + ~~this.actualSalaryOnMonth + ~~this.taxedOnMonth + ~~this.salaryInfo.fiveRisksByCompany + ~~this.salaryInfo.oneGoldByCompany;
+        this.outPackage = ~~this.cash + ~~this.actualSalaryOnMonth + ~~this.taxedOnMonth +
+            ~~this.salaryInfo.fiveRisksByCompany + ~~this.salaryInfo.oneGoldByCompany +
+        ~~this.salaryInfo.fiveRisksByPerson + ~~this.salaryInfo.oneGoldByperson;
     }
 }
 

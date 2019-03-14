@@ -1,6 +1,3 @@
-const MonthlyAudit = require('./MonthlyAudit');
-const Employee = require('../../../main/sqlOperation/model/Employee');
-
 class SalaryOper {
 
     get monthlyAudit() {

@@ -1,26 +1,29 @@
-const SQLite = require('sqlite-sync');
-const DBUrl = `${__dirname}..\\..\\..\\..\\static\\sqlFile\\salary.db`;
-SQLite.connect(DBUrl);
-
 class SqlOperate {
+
+    constructor() {
+        let DBUrl  = `${global.__static}\\sqlFile\\salary.db`;
+        this.SQLite = require('sqlite-sync');
+        this.SQLite.connect(DBUrl);
+    }
+
     //创建表
-    static createTable(sql, callBack) {
-        SQLite.run(sql, callBack || commonCallBack);
+    createTable(sql, callBack) {
+        this.SQLite.run(sql, callBack || commonCallBack);
     }
 
     //插入数据
-    static insertSql(tableName, params, callBack) {
-        SQLite.insert(tableName, params, callBack || commonCallBack);
+    insertSql(tableName, params, callBack) {
+        this.SQLite.insert(tableName, params, callBack || commonCallBack);
     }
 
 
     //更新数据
-    static updateSql(tableName, params, cause, callBack) {
-        SQLite.update(tableName, params, cause, callBack || commonCallBack);
+    updateSql(tableName, params, cause, callBack) {
+        this.SQLite.update(tableName, params, cause, callBack || commonCallBack);
     }
 
     //查询数据
-    static selectSql(sql, where, orderBy, limit, callBack) {
+    selectSql(sql, where, orderBy, limit, callBack) {
         let appendSql = '';
         if (where) {
             for (let key in where) {
@@ -37,12 +40,12 @@ class SqlOperate {
             sql += appendSql;
         }
         console.log("sql====:" + sql);
-        SQLite.run(sql, callBack || commonCallBack);
+        this.SQLite.run(sql, callBack || commonCallBack);
     }
 
     //数据库中添加方法
-    static createFunc(func) {
-        SQLite.create_function(func);
+    createFunc(func) {
+        this.SQLite.create_function(func);
     }
 }
 

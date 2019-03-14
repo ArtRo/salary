@@ -7,7 +7,9 @@ import {app, BrowserWindow} from 'electron'
 if (process.env.NODE_ENV !== 'development') {
     global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
-
+if(process.env.NODE_ENV === 'development'){
+    global.__static = require('path').resolve(__dirname,'../../static');
+}
 const sqlOperate = require('./sqlOperation/SqlOperate');
 const attendanceRecord = require('./sqlOperation/model/AttendanceRecord');
 const employeeInfo = require('./sqlOperation/model/Employee');
@@ -28,7 +30,7 @@ function createWindow() {
         width: 1920
     });
 
-    mainWindow.sqlOperation = sqlOperate;
+    mainWindow.sqlOperation = new sqlOperate();
     mainWindow.employeeInfo = employeeInfo;
     mainWindow.attendanceRecord = attendanceRecord;
     mainWindow.salary = salary;

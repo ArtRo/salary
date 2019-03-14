@@ -16,6 +16,10 @@
     <% if (!process.browser) { %>
       <script>
         if (process.env.NODE_ENV !== 'development') window.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+
+        function sqlOperation() {
+            return require('electron').remote.getCurrentWindow().sqlOperation;
+        }
       </script>
     <% } %>
 
