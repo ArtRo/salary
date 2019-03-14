@@ -19,7 +19,7 @@
   "build": {
     "productName": "oa-salary",
     "appId": "com.example.yourapp",
-    "asar":false,
+    "asar": false,
     "directories": {
       "output": "build"
     },
@@ -52,6 +52,7 @@
     }
   },
   "dependencies": {
+    "asar": "^1.0.0",
     "axios": "^0.18.0",
     "element-ui": "^2.6.1",
     "file-saver": "^2.0.1",

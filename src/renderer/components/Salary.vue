@@ -152,7 +152,7 @@
             </el-table-column>
             <el-table-column label="应纳税额">
                 <template slot-scope="scope">
-                    {{scope.row.monthlyAudit.taxableSalaryOnMonth/100}}
+                    <span :style="{'color':scope.row.color}"> {{scope.row.monthlyAudit.taxableSalaryOnMonth/100}}</span>
                 </template>
             </el-table-column>
             <el-table-column label="累计扣税">
@@ -261,6 +261,7 @@
                                 salaryOper['monthlyAudit'].salaryInfo = Salary.objectFromObject(false, data, null);
                                 salaryOper['monthlyAudit'].getPrevious();
                                 salaryOper['employee'] = Employee.objectFromObject(false, data, null);
+
                                 salaryOper.getAccumulateInfo();
                                 _this.salaries.push(salaryOper);
                             });

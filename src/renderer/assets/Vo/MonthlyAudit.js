@@ -241,7 +241,9 @@ class MonthlyAudit extends AttendanceRecord {
 
     //获取外package
     getOutPackage() {
-        this.outPackage = ~~this.cash + ~~this.actualSalaryOnMonth + ~~this.taxedOnMonth + ~~this.salaryInfo.fiveRisksByCompany + ~~this.salaryInfo.oneGoldByCompany;
+        this.outPackage = ~~this.cash + ~~this.actualSalaryOnMonth + ~~this.taxedOnMonth +
+            ~~this.salaryInfo.fiveRisksByCompany + ~~this.salaryInfo.oneGoldByCompany +
+            ~~this.salaryInfo.fiveRisksByPerson + ~~this.salaryInfo.oneGoldByperson;
     }
 }
 

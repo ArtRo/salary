@@ -1,5 +1,10 @@
 const SQLite = require('sqlite-sync');
-const DBUrl = `${__dirname}..\\..\\..\\..\\static\\sqlFile\\salary.db`;
+let DBUrl = '';
+if (process.env.NODE_ENV !== 'development'){
+    DBUrl  = `${global.__static}\\sqlFile\\salary.db`;
+}else {
+    DBUrl = `${__dirname}..\\..\\..\\..\\static\\sqlFile\\salary.db`;
+}
 SQLite.connect(DBUrl);
 
 class SqlOperate {
